@@ -32,3 +32,5 @@ This concludes the set-up. The correct container can be now opened (without re-i
 
 `docker run -v `<i>< path to FlyingChairs2 ></i>`:/workspace/FlyingChairs2 -v `<i>< path to flow datasets dir ></i>`:/workspace/flowData -v `<i>< path to this repo ></i>`:/workspace/nanoflownet --gpus all -it nanoflownet`
 
+## Links
+[![arXiv](https://img.shields.io/badge/arXiv-2209.06918-b31b1b.svg)](https://arxiv.org/abs/2209.06918)
