@@ -2,10 +2,6 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 
-def EPE(input_flow, target_flow):
-    return tf.reduce_mean(
-        tf.sqrt(tf.reduce_sum(tf.square(tf.subtract(target_flow, input_flow)), axis=-1))
-    )
 
 
 def edge_detail_aggregate_loss(targets, network_output, weights=None, sparse=False):
@@ -80,6 +76,11 @@ def no_loss(targets, network_output, weights=None):
     return 1
 
 
+def end_point_error(input_flow, target_flow):
+    return tf.reduce_mean(
+        tf.sqrt(tf.reduce_sum(tf.square(tf.subtract(target_flow, input_flow)), axis=-1))
+    )
+    
 def multiscaleEPE(targets, network_output, weights=None, sparse=False):
     target_flow = tf.slice(targets, [0, 0, 0, 0], [-1, -1, -1, 2])
 
@@ -92,7 +93,7 @@ def multiscaleEPE(targets, network_output, weights=None, sparse=False):
             output_scaled = tf.image.resize(
                 output, (h_target, w_target), method=tf.image.ResizeMethod.BILINEAR
             )
-        onescaleEPE = EPE(output_scaled, target)
+        onescaleEPE = end_point_error(output_scaled, target)
         return onescaleEPE
 
     if type(network_output) not in [tuple, list]:
@@ -105,12 +106,3 @@ def multiscaleEPE(targets, network_output, weights=None, sparse=False):
     for output, weight in zip(network_output, weights):
         loss += weight * one_scale(output, target_flow, sparse)
     return loss
-
-
-def realEPE(target, output, sparse=False):
-    target = target[:, :, :, 0:2]
-    b, h, w, _ = target.get_shape()
-    upsampled_output = tf.image.resize(
-        output, (h, w), method=tf.image.ResizeMethod.BILINEAR
-    )
-    return EPE(upsampled_output, target)
