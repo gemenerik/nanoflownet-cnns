@@ -234,42 +234,6 @@ def main():
         None,
         args.arch,
     )
-    # (
-    #     _,
-    #     sintel_clean_test_loader,
-    #     sintel_clean_test_length,
-    # ) = return_dali_data_loader(
-    #     "mpi_sintel_clean",
-    #     data_sintel_test,
-    #     0,
-    #     args.batch_size,
-    #     args.workers,
-    #     args.input_height,
-    #     args.input_width,
-    #     args.mosaic,
-    #     args.color,
-    #     -1,
-    #     None,
-    #     args.arch,
-    # )
-    # (
-    #     _,
-    #     sintel_final_test_loader,
-    #     sintel_final_test_length,
-    # ) = return_dali_data_loader(
-    #     "mpi_sintel_final",
-    #     data_sintel_test,
-    #     0,
-    #     args.batch_size,
-    #     args.workers,
-    #     args.input_height,
-    #     args.input_width,
-    #     args.mosaic,
-    #     args.color,
-    #     -1,
-    #     None,
-    #     args.arch,
-    # )
 
     # Set up model
     model = models.__dict__[args.arch](
@@ -342,7 +306,7 @@ def main():
 
         # Save model
         model.save(save_path + "/modelsave", save_format="tf")
-        model.save(save_path + "/modelsave/tinyflownet.h5", save_format="h5")
+        model.save(save_path + "/modelsave/nanoflownet.h5", save_format="h5")
 
         """SAVE TFLITE MODELS"""
         # Convert to TensorFlow lite
@@ -363,7 +327,7 @@ def main():
         multi_input_model.summary()
         converter = tf.lite.TFLiteConverter.from_keras_model(multi_input_model)
         tflite_model = converter.convert()
-        with open(f"{save_path}/modelsave/tinyflownet_unquantized.tflite", "wb") as f:
+        with open(f"{save_path}/modelsave/nanoflownet_unquantized.tflite", "wb") as f:
             f.write(tflite_model)
 
 
