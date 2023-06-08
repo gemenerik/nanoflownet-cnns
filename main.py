@@ -1,17 +1,16 @@
-import datetime
+from datetime import datetime
 import os
-
-import numpy as np
+from numpy.random import seed
 import tensorflow as tf
 from tqdm.keras import TqdmCallback
 
 import models
 from datasets.data_loader import return_dali_data_loader
 from src import flow_vis
-from src.multiscaleloss import (
+from src.loss_functions import (
     edge_detail_aggregate_loss,
     mb_detail_aggregate_loss,
-    multiscaleEPE,
+    multi_scale_end_point_error,
     no_loss,
 )
 from src.parser import return_parsed_args
@@ -173,7 +172,7 @@ def main():
     data_sintel_test = "/workspace/flowData/MPI-Sintel/test/"
 
     # Fix random seed
-    np.random.seed(132)
+    seed(132)
 
     # Create output directory
     save_path = "{},{}epochs{},b{},lr{}".format(
@@ -184,7 +183,7 @@ def main():
         args.lr,
     )
     if not args.no_date:
-        timestamp = datetime.datetime.now().strftime("%m-%d-%H:%M")
+        timestamp = datetime.now().strftime("%m-%d-%H:%M")
         save_path = os.path.join(timestamp, save_path)
     save_path = os.path.join("results/", args.dataset, save_path)
     print("=> will save everything to {}".format(save_path))
@@ -250,32 +249,32 @@ def main():
         model.summary()
         if args.arch == "flownet2s":
             loss_functions = [
-                multiscaleEPE,
-                multiscaleEPE,
-                multiscaleEPE,
-                multiscaleEPE,
+                multi_scale_end_point_error,
+                multi_scale_end_point_error,
+                multi_scale_end_point_error,
+                multi_scale_end_point_error,
             ]
         else:
             if args.detail_guidance == "off":
-                loss_functions = [multiscaleEPE, multiscaleEPE, multiscaleEPE, no_loss]
+                loss_functions = [multi_scale_end_point_error, multi_scale_end_point_error, multi_scale_end_point_error, no_loss]
             elif args.detail_guidance == "motion_boundaries":
                 loss_functions = [
-                    multiscaleEPE,
-                    multiscaleEPE,
-                    multiscaleEPE,
+                    multi_scale_end_point_error,
+                    multi_scale_end_point_error,
+                    multi_scale_end_point_error,
                     mb_detail_aggregate_loss,
                 ]
             elif args.detail_guidance == "edge_detect":
                 loss_functions = [
-                    multiscaleEPE,
-                    multiscaleEPE,
-                    multiscaleEPE,
+                    multi_scale_end_point_error,
+                    multi_scale_end_point_error,
+                    multi_scale_end_point_error,
                     edge_detail_aggregate_loss,
                 ]
 
         model.compile(
             optimizer=tf.keras.optimizers.Adam(args.lr),
-            loss=loss_functions if not args.execution_mode else [multiscaleEPE],
+            loss=loss_functions if not args.execution_mode else [multi_scale_end_point_error],
             loss_weights=args.multiscale_weights
             if (args.arch == "nanoflownet" and not args.execution_mode)
             else [0.3200, 0.1600, 0.0800, 0.0400]

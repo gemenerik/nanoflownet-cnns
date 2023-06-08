@@ -2,8 +2,6 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 
-
-
 def edge_detail_aggregate_loss(targets, network_output, weights=None, sparse=False):
     targets = targets[:, :, :, 0:2]
     laplacian_kernel = tf.constant(
@@ -80,21 +78,18 @@ def end_point_error(input_flow, target_flow):
     return tf.reduce_mean(
         tf.sqrt(tf.reduce_sum(tf.square(tf.subtract(target_flow, input_flow)), axis=-1))
     )
-    
-def multiscaleEPE(targets, network_output, weights=None, sparse=False):
-    target_flow = tf.slice(targets, [0, 0, 0, 0], [-1, -1, -1, 2])
 
-    def one_scale(output, target, sparse):
-        b_target, h_target, w_target, _ = target.get_shape()
-        b_output, h_output, w_output, _ = output.get_shape()
-        if sparse:
-            raise NotImplementedError
-        else:
-            output_scaled = tf.image.resize(
-                output, (h_target, w_target), method=tf.image.ResizeMethod.BILINEAR
-            )
-        onescaleEPE = end_point_error(output_scaled, target)
-        return onescaleEPE
+
+def scale_output_to_target(output, target):
+    b_target, h_target, w_target, _ = target.get_shape()
+    output_scaled = tf.image.resize(
+        output, (h_target, w_target), method=tf.image.ResizeMethod.BILINEAR
+    )
+    return end_point_error(output_scaled, target)
+    
+
+def multi_scale_end_point_error(targets, network_output, weights=None, sparse=False):
+    target_flow = tf.slice(targets, [0, 0, 0, 0], [-1, -1, -1, 2])
 
     if type(network_output) not in [tuple, list]:
         network_output = [network_output]
@@ -104,5 +99,5 @@ def multiscaleEPE(targets, network_output, weights=None, sparse=False):
 
     loss = 0
     for output, weight in zip(network_output, weights):
-        loss += weight * one_scale(output, target_flow, sparse)
+        loss += weight * scale_output_to_target(output, target_flow, sparse)
     return loss
