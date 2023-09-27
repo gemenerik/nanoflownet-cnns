@@ -8,7 +8,7 @@ Nano quadcopters are small, agile, and cheap platforms that are well suited for 
 
 The easiest way to set up is to install all requirements into a docker environment:
 
-`docker run -v `<i>< path to FlyingChairs2 ></i>`:/workspace/FlyingChairs2 -v `<i>< path to flow datasets dir ></i>`:/workspace/flowData -v `<i>< path to this repo ></i>`:/workspace/nanoflownet --gpus all -it tensorflow/tensorflow:2.8.0-gpu`
+`docker run -v <path to FlyingChairs2>:/workspace/FlyingChairs2 -v <path to flow datasets dir>:/workspace/flowData -v <path to this repo>:/workspace/nanoflownet --gpus all -it tensorflow/tensorflow:2.8.0-gpu`
 
 Inside the created docker container:
 
@@ -32,4 +32,4 @@ and commit the changes
 
 This concludes the set-up. The correct container can be now opened (without re-installing the pip requirements) by replacing `tensorflow/tensorflow:2.8.0-gpu` with `nanoflownet`:
 
-`docker run -v `<i>< path to FlyingChairs2 ></i>`:/workspace/FlyingChairs2 -v `<i>< path to flow datasets dir ></i>`:/workspace/flowData -v `<i>< path to this repo ></i>`:/workspace/nanoflownet --gpus all -it nanoflownet`
+`docker run -v <path to FlyingChairs2>:/workspace/FlyingChairs2 -v <path to flow datasets dir>:/workspace/flowData -v <path to this repo>:/workspace/nanoflownet --gpus all -it nanoflownet`
